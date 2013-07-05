@@ -1,0 +1,1 @@
+UPDATE members SET netid='jaw457',college= 'EN' WHERE name = 'Jaden Williams';

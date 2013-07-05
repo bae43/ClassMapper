@@ -1,0 +1,187 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN"
+"http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:v="urn:schemas-microsoft-com:vml">
+	<head>
+		<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+		<title>Google Maps - MarkerManager Exercise</title>
+		<script src="http://maps.google.com/maps?file=api&amp;v=2&amp;key=AIzaSyD_83CzBlFQ9PJhVFqzvObYCg36j4TnDBM" type="text/javascript"></script>
+		<script src="http://gmaps-utility-library.googlecode.com/svn/trunk/markermanager/release/src/markermanager.js"></script>
+		<script src="http://gmaps-utility-library.googlecode.com/svn/trunk/progressbarcontrol/1.0/src/progressbarcontrol.js"></script>
+
+		<script type="text/javascript">
+			var gmap = null;
+
+			function initialize() {
+				gmap = new GMap2(document.getElementById('gmap'));
+				gmap.addMapType(G_NORMAL_MAP);
+				gmap.addMapType(G_SATELLITE_MAP);
+				gmap.addMapType(G_PHYSICAL_MAP);
+				gmap.setMapType(G_PHYSICAL_MAP);
+				gmap.addControl(new GMapTypeControl());
+				gmap.addControl(new GLargeMapControl());
+				gmap.setCenter(new GLatLng(33.037494, -117.082111), 13);
+				gmap.enableScrollWheelZoom();
+				
+				addMarkersFromXML();
+
+			}
+
+			function addMarkersFromXML() {
+				var batch = [];
+				mgr = new MarkerManager(gmap);
+
+				var request = GXmlHttp.create();
+				request.open('GET', 'fires.xml', true);
+				request.onreadystatechange = function() {
+					if (request.readyState == 4) {
+						var xmlDoc = request.responseXML;
+						var markers = xmlDoc.documentElement.getElementsByTagName("fire");
+
+						// for (var i = 0; i < markers.length; i++) {
+						// var point = new GLatLng(parseFloat(markers[i].getAttribute("latitude")), parseFloat(markers[i].getAttribute("longitude")));
+						// var latitude = markers[i].getAttribute("latitude")
+						// var longitude = markers[i].getAttribute("longitude")
+						// var addr = markers[i].getAttribute("address");
+						// var city = markers[i].getAttribute("city");
+						// var state = markers[i].getAttribute("state");
+						// var zip = markers[i].getAttribute("zip");
+						// var marker = createMarker(point,addr);
+						// batch.push(marker);
+						// }
+
+						for (var i = 0; i < markers.length; i++) {
+							var point = new GLatLng(parseFloat(markers[i].getAttribute("latitude")), parseFloat(markers[i].getAttribute("longitude")));
+							var latitude = markers[i].getAttribute("latitude")
+							var longitude = markers[i].getAttribute("longitude")
+							var addr = markers[i].getAttribute("address");
+							var city = markers[i].getAttribute("city");
+							var state = markers[i].getAttribute("state");
+							var zip = markers[i].getAttribute("zip");
+							var marker = createMarker(point, addr);
+							batch.push(marker);
+						}
+
+						mgr.addMarkers(batch, 10);
+						mgr.refresh();
+
+					}
+				}
+				request.send(null);
+			}
+
+			new_en_pin = function(point) {
+				var ico = new GIcon(G_DEFAULT_ICON);
+				ico.image = "pins/en.png";
+
+				var markerOptions = {
+					icon : ico
+				};
+
+				var marker = new GMarker(point, markerOptions);
+
+				GEvent.addListener(marker, "click", function() {
+					marker.openInfoWindowHtml("College of Engineering");
+				});
+
+				return marker;
+			}
+			new_ag_pin = function(point) {
+				var ico = new GIcon(G_DEFAULT_ICON);
+				ico.image = "pins/ag.png";
+
+				var markerOptions = {
+					icon : ico
+				};
+
+				var marker = new GMarker(point, markerOptions);
+
+				GEvent.addListener(marker, "click", function() {
+					marker.openInfoWindowHtml("College of Agriculture and Life Sciences");
+				});
+
+				return marker;
+			}
+			new_ar_pin = function(point) {
+				var ico = new GIcon(G_DEFAULT_ICON);
+				ico.image = "pins/ar.png";
+
+				var markerOptions = {
+					icon : ico
+				};
+
+				var marker = new GMarker(point, markerOptions);
+
+				GEvent.addListener(marker, "click", function() {
+					marker.openInfoWindowHtml("College of Archetecture and Arts Planning");
+				});
+
+				return marker;
+			}
+			new_ha_pin = function(point) {
+				var ico = new GIcon(G_DEFAULT_ICON);
+				ico.image = "pins/ha.png";
+
+				var markerOptions = {
+					icon : ico
+				};
+
+				var marker = new GMarker(point, markerOptions);
+
+				GEvent.addListener(marker, "click", function() {
+					marker.openInfoWindowHtml("School of Hotel Administration");
+				});
+
+				return marker;
+			}
+			var college = 0;
+			function createMarker(point) {
+				college = (college + 1) % 4;
+				if (college == 0) {
+					return new_ag_pin(point);
+					//return new GMarker(point, html);
+
+				} else if (college == 1) {
+					return new_ar_pin(point);
+					//return new GMarker(point, html);
+
+				} else if (college == 2) {
+					return new_en_pin(point);
+					//return new GMarker(point, html);
+
+				} else if (college == 3) {
+					return new_ha_pin(point);
+					//return new GMarker(point, html);
+
+				} else {
+					var marker = new GMarker(point);
+					GEvent.addListener(marker, "click", function() {
+						marker.openInfoWindowHtml("...");
+					});
+
+					return marker;
+				}
+			}
+		</script>
+
+	</head>
+	<body onload="initialize()" onunload="GUnload">
+		<div id="gmap" style="width: 100%; height: 100%"></div>
+		<table width="100%" height="100%">
+			<tr>
+				<td align="left">
+				<table>
+
+
+					<tr align="left" valign="top">
+						<td><div id="gmap" style="width: 100%; height:100%;"></div></td>
+					</tr>
+
+					<tr align="left" valign="top">
+						<td><div id="results"></div></td>
+					</tr>
+
+				</table></td>
+			</tr>
+		</table>
+	</body>
+</html>
