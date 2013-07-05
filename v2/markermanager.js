@@ -71,6 +71,8 @@
  *   {Boolean} trackMarkers Whether or not this manager should track marker
  *                   movements.
  */
+
+
 function MarkerManager(map, opt_opts) {
   var me = this;
   me.map_ = map;
@@ -81,6 +83,8 @@ function MarkerManager(map, opt_opts) {
     me.projection_ = this.getProjection();
     me.initialize(map, opt_opts);
   });
+  
+
 }
 
   
@@ -133,6 +137,8 @@ MarkerManager.prototype.initialize = function (map, opt_opts) {
   google.maps.event.addListener(map, 'zoom_changed', function () {
     me.onMapMoveEnd_();
   });
+  
+  
 
 
 

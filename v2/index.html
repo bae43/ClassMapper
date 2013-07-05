@@ -2,82 +2,98 @@
 <head>
 	<title>Class Plotter</title>
 	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
-	<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/tags/markermanager/1.0/src/markermanager.js"></script>
+	<script type="text/javascript" src="markermanager.js"></script>
 	<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
-	<script type="text/javascript" src="markers_simple.js"></script>
+	<script type="text/javascript" src="markers.js"></script>
 	<script type="text/javascript" src="functions.js"></script>
 	<script type="text/javascript" src="mapper.js"></script>
-	<style type="text/css">
-		#map {
-			width: 900px;
-			height: 600px;
-		}
-		#controls {
-			margin: 0;
-			list-style: none;
-		}
-		#controls li {
-			display: inline;
-			margin-left: 42px;
-			font-family: Sans-Serif;
-			font-size: 10pt;
-		}
-		#fusion-hm-li {
-			visibility: hidden;
-			margin-left: 8px;
-		}
-	</style>
-	<script>
-		window.fbAsyncInit = function() {
-			// init the FB JS SDK
-			FB.init({
-				appId : '138847099651482', // App ID from the app dashboard
-				//channelUrl : '//WWW.YOUR_DOMAIN.COM/channel.html', // Channel file for x-domain comms
-				status : true, // Check Facebook Login status
-				xfbml : true // Look for social plugins on the page
-			});
+<link rel="stylesheet" href="style.css">
 
-			// Additional initialization code such as adding Event Listeners goes here
-		};
-
-		// Load the SDK asynchronously
-		( function(d, s, id) {
-				var js, fjs = d.getElementsByTagName(s)[0];
-				if (d.getElementById(id)) {
-					return;
-				}
-				js = d.createElement(s);
-				js.id = id;
-				js.src = "//connect.facebook.net/en_US/all.js";
-				fjs.parentNode.insertBefore(js, fjs);
-			}(document, 'script', 'facebook-jssdk'));
-
-
-
-	
-
-	</script>
 </head>
 <body>
+	
+	<div id="fb-root"></div>
+<script>
+  window.fbAsyncInit = function() {
+    // init the FB JS SDK
+    FB.init({
+      appId      : '138847099651482',                        // App ID from the app dashboard
+      channelUrl : 'http://bryceevans.info/misc/mapper/', // Channel file for x-domain comms
+      status     : true,                                 // Check Facebook Login status
+      xfbml      : true                                  // Look for social plugins on the page
+    });
+
+
+	 FB.login(function(response) {
+	 	console.log("logging in");
+   if (response.authResponse) {
+     console.log('Welcome!  Fetching your information.... ');
+     FB.api('/me', function(response) {
+       console.log('Good to see you, ' + response.name + '.');
+     });
+   } else {
+     console.log('User cancelled login or did not fully authorize.');
+   }
+ });
+ 
+    // Additional initialization code such as adding Event Listeners goes here
+    FB.getLoginStatus(function(response) {
+    	console.log(response);
+
+
+ 
+ 
+
+	// mapper.ui.prototype.updateFBLoginStatus(fbLoginStatus);
+	// mapper.ui.prototype.fb_change_login(); 
+	// if (response.authResponse) {
+		// mapper.ui.accessToken = response.authResponse.accessToken;
+		// if (response.status == 'connected') {
+			// alert(response);
+		// }
+	// }
+
+});
+
+  };
+
+   
+   
+
+
+  // Load the SDK asynchronously
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/all.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+<div id="fb_button">
+      <span>Log In</span>
+    </div>
 	<div id="map"></div>
 	<ul id="controls">
-		<li>
+		<li class = "hidden">
 			<label for="mgr-cb">Marker Manager</label>
 			<input type="checkbox" id="mgr-cb" name="mgr-cb" />
 		</li>
-		<li>
-			<label for="mc-cb">Marker Clusterer</label>
-			<input type="checkbox" id="mc-cb" name="mc-cb" />
-		</li>
-		<li>
-			<label for="fusion-cb">Fusion Table Layer</label>
+				<li>
+			<label for="fusion-cb">Show Everyone</label>
 			<input type="checkbox" id="fusion-cb" name="fusion-cb" />
 		</li>
-		<li id="fusion-hm-li">
+		
+		<li>
+			<label for="mc-cb">Show Groups</label>
+			<input type="checkbox" id="mc-cb" name="mc-cb" />
+		</li>
+
+		<li id="fusion-hm-li" class = "hidden">
 			<label for="fusion-hm-cb">with heatmap</label>
 			<input type="checkbox" id="fusion-hm-cb" name="fusion-hm-cb" />
 		</li>
-		<li>
+		<li class = "hidden">
 			<label for="kml-cb">KML Layer</label>
 			<input type="checkbox" id="kml-cb" name="kml-cb" />
 		</li>
