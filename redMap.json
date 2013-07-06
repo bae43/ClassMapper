@@ -1,0 +1,64 @@
+[
+  {
+    "featureType": "landscape.natural.landcover",
+    "stylers": [
+      { "saturation": 70 },
+      { "hue": "#ff0008" },
+      { "lightness": -24 }
+    ]
+  },{
+    "featureType": "administrative",
+    "elementType": "geometry",
+    "stylers": [
+      { "visibility": "on" },
+      { "invert_lightness": true },
+      { "hue": "#ff003b" },
+      { "saturation": -41 },
+      { "lightness": 89 },
+      { "weight": 0.6 }
+    ]
+  },{
+    "featureType": "water",
+    "stylers": [
+      { "hue": "#00ddff" },
+      { "lightness": 50 },
+      { "saturation": -66 }
+    ]
+  },{
+    "featureType": "road",
+    "stylers": [
+      { "hue": "#ff0000" },
+      { "lightness": 33 },
+      { "weight": 0.7 }
+    ]
+  },{
+    "featureType": "administrative",
+    "stylers": [
+      { "visibility": "on" },
+      { "hue": "#ff0000" },
+      { "lightness": 11 }
+    ]
+  },{
+    "featureType": "administrative",
+    "stylers": [
+      { "invert_lightness": true },
+      { "visibility": "off" }
+    ]
+  },{
+    "featureType": "poi",
+    "stylers": [
+      { "visibility": "off" }
+    ]
+  },{
+    "featureType": "road"  },{
+    "featureType": "administrative",
+    "elementType": "geometry",
+    "stylers": [
+      { "hue": "#ff0011" },
+      { "saturation": 100 },
+      { "visibility": "on" },
+      { "lightness": 41 },
+      { "weight": 1.3 }
+    ]
+  }
+]

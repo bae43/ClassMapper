@@ -29,8 +29,8 @@
 	 	console.log("logging in");
    if (response.authResponse) {
      console.log('Welcome!  Fetching your information.... ');
-     FB.api('/me', function(response) {
-       console.log('Good to see you, ' + response.name + '.');
+     FB.api('/me?fields=id,name,location', function(response) {
+       console.log('Good to see you, ' + response.name + ' from ' + response.location.name);
      });
    } else {
      console.log('User cancelled login or did not fully authorize.');
@@ -71,9 +71,24 @@
      fjs.parentNode.insertBefore(js, fjs);
    }(document, 'script', 'facebook-jssdk'));
 </script>
-<div id="fb_button">
-      <span>Log In</span>
-    </div>
+<div id='header'>
+	<span id="cm_title">Class Mapper:</span>
+	<span id="class_name_title">Cornell 2017</span>
+<ul>
+   <li class='active'><a href='index.html'><span>Map</span></a></li>
+   <li><a href='#'><span>Class Profile</span></a></li>
+   <li><a href='#'><span>Settings</span></a></li>
+   <li class='last'><a href='#'><span><img id="fb_button" src="fb_icon.png"></span></a></li>
+
+</ul>
+</div>
+
+<div id="me" class = "side_pane"></div>
+<div id="settings" class = "side_pane"></div>
+
+<div id="profile"></div>
+
+
 	<div id="map"></div>
 	<ul id="controls">
 		<li class = "hidden">

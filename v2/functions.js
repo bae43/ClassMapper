@@ -184,7 +184,8 @@ function codeLatLng(geocoder, map, divId, latlng) {
 	}, function(results, status) {
 		if (status == google.maps.GeocoderStatus.OK) {
 			if (results[1]) {
-				map.setZoom(11);
+				var zoom = map.getZoom(); 
+			//	if(zoom < 8) map.setZoom(8);
 				marker = new google.maps.Marker({
 					position : latlng,
 					map : map
@@ -208,9 +209,69 @@ function codeLatLng(geocoder, map, divId, latlng) {
  * Initializes the map and listeners.
  */
 function initialize() {
+
+	styles = {
+		'Chilled' : [{
+			featureType : 'road',
+			elementType : 'geometry',
+			rules : [{
+				'visibility' : 'simplified'
+			}]
+		}, {
+			featureType : 'road.arterial',
+			rules : [{
+				hue : 149
+			}, {
+				saturation : -78
+			}, {
+				lightness : 0
+			}]
+		}, {
+			featureType : 'road.highway',
+			rules : [{
+				hue : -31
+			}, {
+				saturation : -40
+			}, {
+				lightness : 2.8
+			}]
+		}, {
+			featureType : 'poi',
+			elementType : 'label',
+			rules : [{
+				'visibility' : 'off'
+			}]
+		}, {
+			featureType : 'landscape',
+			rules : [{
+				hue : 163
+			}, {
+				saturation : -26
+			}, {
+				lightness : -1.1
+			}]
+		}, {
+			featureType : 'transit',
+			rules : [{
+				'visibility' : 'off'
+			}]
+		}, {
+			featureType : 'water',
+			rules : [{
+				hue : 3
+			}, {
+				saturation : -24.24
+			}, {
+				lightness : -38.57
+			}]
+		}]
+	};
+
 	map = new google.maps.Map(document.getElementById('map'), {
-		center : new google.maps.LatLng(38, 15),
+		center : new google.maps.LatLng(39, -15),
+		// disableDefaultUI: true,
 		zoom : 2,
+		minZoom: 2,
 		mapTypeId : 'terrain',
 
 	});
@@ -220,17 +281,22 @@ function initialize() {
 	google.maps.event.addDomListener(document.getElementById('mc-cb'), 'click', toggleMarkerClusterer);
 	google.maps.event.addDomListener(document.getElementById('mgr-cb'), 'click', toggleMarkerManager);
 
-	var noPoi = [{
-		featureType : "poi",
-		stylers : [{
-			visibility : "off"
-		}]
-	}];
+	$.ajax({
+		url : "http://localhost:8020/ClassMapper/chilled.json",
+		context : document.body,
+		format : "json"
+	}).done(function(styles) {
+		alert("asdf");
+		console.log(styles);
+		map.setOptions({
+			styles : styles
+		});
 
-	map.setOptions({
-		styles : noPoi
 	});
 
+	map.setOptions({
+		styles : styles
+	});
 	var geocoder = new google.maps.Geocoder();
 
 	google.maps.event.addListener(map, 'click', function(event) {
@@ -259,6 +325,28 @@ function initialize() {
 			}
 		}
 	}
+
+	// $(document).ready(function() {
+		// $("#button").click(function() {
+			// var name = $("#name").val();
+			// var message = $("#message").val();
+// 
+			// $.ajax({
+				// type : "POST",
+				// url : "updateLoc.php",
+				// data : {
+					// name : name,
+					// message : message
+				// },
+				// success : function(data) {
+					// $("#info").html(data);
+				// }
+			// });
+// 
+			// return false;
+		// });
+	// });
+
 }
 
 google.maps.event.addDomListener(window, 'load', initialize);
