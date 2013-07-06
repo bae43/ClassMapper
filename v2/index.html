@@ -6,8 +6,9 @@
 	<script type="text/javascript" src="js/markermanager.js"></script>
 	<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
 	<script type="text/javascript" src="js/markers.js"></script>
-	<script type="text/javascript" src="js/functions.js"></script>
 	<script type="text/javascript" src="js/mapper.js"></script>
+	<script type="text/javascript" src="js/functions.js"></script>
+
 	<link rel="stylesheet" href="style.css">
 
 </head>
@@ -30,7 +31,7 @@
 					console.log('Welcome!  Fetching your information.... ');
 					FB.api('/me?fields=id,name,location', function(response) {
 						console.log('Good to see you, ' + response.name + ' from ' + response.location.name);
-						findLocation(response);
+						mapper.UI.findLocation(response);
 					});
 
 				} else {
