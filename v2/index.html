@@ -2,117 +2,125 @@
 <head>
 	<title>Class Plotter</title>
 	<script type='text/javascript' src='http://code.jquery.com/jquery-1.10.2.min.js'></script>
-	<script type="text/javascript" src="http://maps.google.com/maps/api/js?sensor=false"></script>
+	<script src="https://maps.googleapis.com/maps/api/js?v=3.exp&sensor=false&libraries=places"></script>
 	<script type="text/javascript" src="markermanager.js"></script>
 	<script type="text/javascript" src="http://google-maps-utility-library-v3.googlecode.com/svn/trunk/markerclusterer/src/markerclusterer_compiled.js"></script>
 	<script type="text/javascript" src="markers.js"></script>
 	<script type="text/javascript" src="functions.js"></script>
 	<script type="text/javascript" src="mapper.js"></script>
-<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="style.css">
 
 </head>
 <body>
-	
+
 	<div id="fb-root"></div>
-<script>
-  window.fbAsyncInit = function() {
-    // init the FB JS SDK
-    FB.init({
-      appId      : '138847099651482',                        // App ID from the app dashboard
-      channelUrl : 'http://bryceevans.info/misc/mapper/', // Channel file for x-domain comms
-      status     : true,                                 // Check Facebook Login status
-      xfbml      : true                                  // Look for social plugins on the page
-    });
+	<script>
+		window.fbAsyncInit = function() {
+			// init the FB JS SDK
+			FB.init({
+				appId : '138847099651482', // App ID from the app dashboard
+				channelUrl : 'http://bryceevans.info/misc/mapper/', // Channel file for x-domain comms
+				status : true, // Check Facebook Login status
+				xfbml : true // Look for social plugins on the page
+			});
 
+			FB.login(function(response) {
+				console.log("logging in");
+				if (response.authResponse) {
+					console.log('Welcome!  Fetching your information.... ');
+					FB.api('/me?fields=id,name,location', function(response) {
+						console.log('Good to see you, ' + response.name + ' from ' + response.location.name);
+						findLocation(response);
+					});
 
-	 FB.login(function(response) {
-	 	console.log("logging in");
-   if (response.authResponse) {
-     console.log('Welcome!  Fetching your information.... ');
-     FB.api('/me?fields=id,name,location', function(response) {
-       console.log('Good to see you, ' + response.name + ' from ' + response.location.name);
-     });
-   } else {
-     console.log('User cancelled login or did not fully authorize.');
-   }
- });
- 
-    // Additional initialization code such as adding Event Listeners goes here
-    FB.getLoginStatus(function(response) {
-    	console.log(response);
+				} else {
+					console.log('User cancelled login or did not fully authorize.');
+				}
+			});
 
+			// Additional initialization code such as adding Event Listeners goes here
+			FB.getLoginStatus(function(response) {
+				console.log(response);
 
- 
- 
+				// mapper.ui.prototype.updateFBLoginStatus(fbLoginStatus);
+				// mapper.ui.prototype.fb_change_login();
+				// if (response.authResponse) {
+				// mapper.ui.accessToken = response.authResponse.accessToken;
+				// if (response.status == 'connected') {
+				// alert(response);
+				// }
+				// }
 
-	// mapper.ui.prototype.updateFBLoginStatus(fbLoginStatus);
-	// mapper.ui.prototype.fb_change_login(); 
-	// if (response.authResponse) {
-		// mapper.ui.accessToken = response.authResponse.accessToken;
-		// if (response.status == 'connected') {
-			// alert(response);
-		// }
-	// }
+			});
 
-});
+		};
 
-  };
+		// Load the SDK asynchronously
+		( function(d, s, id) {
+				var js, fjs = d.getElementsByTagName(s)[0];
+				if (d.getElementById(id)) {
+					return;
+				}
+				js = d.createElement(s);
+				js.id = id;
+				js.src = "//connect.facebook.net/en_US/all.js";
+				fjs.parentNode.insertBefore(js, fjs);
+			}(document, 'script', 'facebook-jssdk'));
+	</script>
+	<div id='header'>
+		<span id="cm_title">Class Mapper:</span>
 
-   
-   
+		<!--<embed id="cu_logo" src="cu_logo.svg" type="image/svg+xml" />-->
+		<img id="cu_logo" src="cu_logo.svg"></img><span id="class_name_title">2017</span>
+		<ul>
+			<li class='active'>
+				<a href='index.html'><span>Map</span></a>
+			</li>
+			<li>
+				<a href='#'><span>Class Profile</span></a>
+			</li>
+			<li>
+				<a href='#'><span>Settings</span></a>
+			</li>
+			<li class='last'>
+				<a href='#'><span><img id="fb_button" src="fb_icon.png"></span></a>
+			</li>
 
+		</ul>
+	</div>
 
-  // Load the SDK asynchronously
-  (function(d, s, id){
-     var js, fjs = d.getElementsByTagName(s)[0];
-     if (d.getElementById(id)) {return;}
-     js = d.createElement(s); js.id = id;
-     js.src = "//connect.facebook.net/en_US/all.js";
-     fjs.parentNode.insertBefore(js, fjs);
-   }(document, 'script', 'facebook-jssdk'));
-</script>
-<div id='header'>
-	<span id="cm_title">Class Mapper:</span>
-	<span id="class_name_title">Cornell 2017</span>
-<ul>
-   <li class='active'><a href='index.html'><span>Map</span></a></li>
-   <li><a href='#'><span>Class Profile</span></a></li>
-   <li><a href='#'><span>Settings</span></a></li>
-   <li class='last'><a href='#'><span><img id="fb_button" src="fb_icon.png"></span></a></li>
+	<div id="me" class = "side_pane"></div>
+	<div id="settings" class = "side_pane">
+		<input id="placeSearch" type="text" placeholder="Search Box" autocomplete="off">
+		<ul id="controls">
+			<li class = "hidden">
+				<label for="mgr-cb">Marker Manager</label>
+				<input type="checkbox" id="mgr-cb" name="mgr-cb" />
+			</li>
+			<li>
+				<label for="fusion-cb">Show Everyone</label>
+				<input type="checkbox" id="fusion-cb" name="fusion-cb" />
+			</li>
 
-</ul>
-</div>
+			<li>
+				<label for="mc-cb">Show Groups</label>
+				<input type="checkbox" id="mc-cb" name="mc-cb" />
+			</li>
 
-<div id="me" class = "side_pane"></div>
-<div id="settings" class = "side_pane"></div>
+			<li id="fusion-hm-li" class = "hidden">
+				<label for="fusion-hm-cb">with heatmap</label>
+				<input type="checkbox" id="fusion-hm-cb" name="fusion-hm-cb" />
+			</li>
+			<li class = "hidden">
+				<label for="kml-cb">KML Layer</label>
+				<input type="checkbox" id="kml-cb" name="kml-cb" />
+			</li>
+		</ul>
+	</div>
 
-<div id="profile"></div>
-
+	<div id="profile"></div>
 
 	<div id="map"></div>
-	<ul id="controls">
-		<li class = "hidden">
-			<label for="mgr-cb">Marker Manager</label>
-			<input type="checkbox" id="mgr-cb" name="mgr-cb" />
-		</li>
-				<li>
-			<label for="fusion-cb">Show Everyone</label>
-			<input type="checkbox" id="fusion-cb" name="fusion-cb" />
-		</li>
-		
-		<li>
-			<label for="mc-cb">Show Groups</label>
-			<input type="checkbox" id="mc-cb" name="mc-cb" />
-		</li>
 
-		<li id="fusion-hm-li" class = "hidden">
-			<label for="fusion-hm-cb">with heatmap</label>
-			<input type="checkbox" id="fusion-hm-cb" name="fusion-hm-cb" />
-		</li>
-		<li class = "hidden">
-			<label for="kml-cb">KML Layer</label>
-			<input type="checkbox" id="kml-cb" name="kml-cb" />
-		</li>
-	</ul>
 </body>
 </html>
