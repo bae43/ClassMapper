@@ -125,7 +125,7 @@ function toggleMarkerManager() {
 			mgr.refresh();
 		}
 	} else {
-		mgr = new MarkerManager(map, {
+		mgr = new MarkerManager(ui.map, {
 			trackMarkers : true,
 			maxZoom : 15
 		});
@@ -137,25 +137,6 @@ function toggleMarkerManager() {
 		});
 	}
 }
-
-/**
- * Toggles Marker Clusterer visibility.
- */
-function toggleMarkerClusterer() {
-	showMarketClusterer = !showMarketClusterer;
-	if (showMarketClusterer) {
-		if (mc) {
-			mc.addMarkers(markers.locations);
-		} else {
-			mc = new MarkerClusterer(map, markers.locations, {
-				maxZoom : 19
-			});
-		}
-	} else {
-		mc.clearMarkers();
-	}
-}
-
 
 
 

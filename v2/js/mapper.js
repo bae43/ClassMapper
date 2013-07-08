@@ -9,8 +9,11 @@ var mapper = {};
 mapper.UI = function() {
 	this.accessToken = "";
 	this.myMarker = null;
+	if (markers) {
+		this.markers = markers;
+	}
 
-	this.map = new google.maps.Map(document.getElementById('map'), {
+	this.map = new google.maps.Map($("#map").get(0), {
 		center : new google.maps.LatLng(39, -15),
 		// disableDefaultUI: true,
 		zoom : 2,
@@ -25,41 +28,41 @@ mapper.UI = function() {
 
 	this.geocoder = new google.maps.Geocoder();
 
-	google.maps.event.addDomListener(document.getElementById('fusion-cb'), 'click', toggleFusion);
-	google.maps.event.addDomListener(document.getElementById('fusion-hm-cb'), 'click', toggleFusionHeatmap);
-	google.maps.event.addDomListener(document.getElementById('kml-cb'), 'click', toggleKmlLayer);
-	google.maps.event.addDomListener(document.getElementById('mc-cb'), 'click', toggleMarkerClusterer);
-	google.maps.event.addDomListener(document.getElementById('mgr-cb'), 'click', toggleMarkerManager);
+	google.maps.event.addDomListener(document.getElementById('fusion-cb'), 'click', this.toggleFusion.bind(this));
+	// google.maps.event.addDomListener(document.getElementById('fusion-hm-cb'), 'click', this.toggleFusionHeatmap.bind(this));
+	// google.maps.event.addDomListener(document.getElementById('kml-cb'), 'click', toggleKmlLayer);
+	google.maps.event.addDomListener(document.getElementById('mc-cb'), 'click', this.toggleMarkerClusterer.bind(this));
+	// google.maps.event.addDomListener(document.getElementById('mgr-cb'), 'click', this.toggleMarkerManager.bind(this));
 
 	$.ajax({
 		url : "http://localhost:8020/ClassMapper/v2/js/themes.json",
 		context : document.body,
 		format : "json"
-	}).done(function(styles) {
+	}).done( function(styles) {
 		console.log(styles);
-		map.setOptions({
+		this.map.setOptions({
 			styles : styles.blue
 		});
 
-	});
+	}.bind(this));
 
-	google.maps.event.addListener(map, 'click', function(event) {
+	google.maps.event.addListener(this.map, 'click', function(event) {
 		//call function to create marker
 		if (this.myMarker) {
 			this.myMarker.setMap(null);
 			this.myMarker = null;
 		}
 		//marker = createMarker(event.latLng, "name", "<b>Location</b><br><span style='font-size: 12px;'>(" + event.latLng.lat().toFixed(4) + "," + event.latLng.lng().toFixed(4)  + ")</span><br><span id='myAddress'></span>");
-		codeLatLng(geocoder, map, "myAddress", event.latLng);
-	});
+		this.codeLatLng(this.geocoder, this.map, "myAddress", event.latLng);
+	}.bind(this));
 
 	// Prepares the marker object, creating a google.maps.Marker object for each
 	// location, place and country
-	if (markers) {
-		for (var level in markers) {
-			for (var i = 0; i < markers[level].length; i++) {
-				var details = markers[level][i];
-				markers[level][i] = new google.maps.Marker({
+	if (this.markers) {
+		for (var level in this.markers) {
+			for (var i = 0; i < this.markers[level].length; i++) {
+				var details = this.markers[level][i];
+				this.markers[level][i] = new google.maps.Marker({
 					title : details.level,
 					position : new google.maps.LatLng(details.location[0], details.location[1]),
 					clickable : false,
@@ -91,43 +94,48 @@ mapper.UI = function() {
 	// });
 	// });
 
-	var markers = [];
+	var searchMarkers = [];
 
-	var input = /** @type {HTMLInputElement} */(document.getElementById('placeSearch'));
+	var input = (document.getElementById('placeSearch'));
 	var searchBox = new google.maps.places.SearchBox(input);
 
 	google.maps.event.addListener(searchBox, 'places_changed', function() {
 		var places = searchBox.getPlaces();
 
-		for (var i = 0, marker; marker = markers[i]; i++) {
+		for (var i = 0, marker; marker = searchMarkers[i]; i++) {
 			marker.setMap(null);
 		}
-
-		markers = [];
+		// create a temporary set of markers that are different (smaller) and clear later
+		searchMarkers = [];
 		var bounds = new google.maps.LatLngBounds();
-		for (var i = 0, place; place = places[i]; i++) {
-			var image = {
-				url : place.icon,
-				size : new google.maps.Size(71, 71),
-				origin : new google.maps.Point(0, 0),
-				anchor : new google.maps.Point(17, 34),
-				scaledSize : new google.maps.Size(25, 25)
-			};
-
-			this.myMarker = createMarker(place.geometry.location, place.name);
-
-			markers.push(this.myMarker);
-
-			bounds.extend(place.geometry.location);
+		if (places[0]) {
+			this.myMarker = this.createMarker(places[0].geometry.location, places[0].name);
 		}
 
-		map.fitBounds(bounds);
-	});
+		// for (var i = 0, place; place = places[i]; i++) {
+		// var image = {
+		// url : place.icon,
+		// size : new google.maps.Size(71, 71),
+		// origin : new google.maps.Point(0, 0),
+		// anchor : new google.maps.Point(17, 34),
+		// scaledSize : new google.maps.Size(25, 25)
+		// };
+		//
+		// this.myMarker = this.createMarker(place.geometry.location, place.name);
+		//
+		// markers.push(this.myMarker);
+		//
+		// bounds.extend(place.geometry.location);
+		// }
+		//
+		// this.map.fitBounds(bounds);
+	}.bind(this));
 
-	google.maps.event.addListener(map, 'bounds_changed', function() {
-		var bounds = map.getBounds();
+	google.maps.event.addListener(this.map, 'bounds_changed', function() {
+		// TODO - handle multiple returns (e.g. "Austin")
+		var bounds = this.map.getBounds();
 		searchBox.setBounds(bounds);
-	});
+	}.bind(this));
 
 	$('#fb_button').click( function() {
 
@@ -168,11 +176,11 @@ mapper.UI.prototype = {
 			zIndex : Math.round(latlng.lat() * -100000) << 5
 		});
 
-		google.maps.event.addListener(this.myMarker, 'click', function() {
-			infowindow.setContent("<b>Location</b><br><span style='font-size: 12px;'>(" + latlng.lat().toFixed(4) + "," + latlng.lng().toFixed(4) + ")</span><br><span id='myAddress'>" + placeName + "</span>");
+		google.maps.event.addListener(marker, 'click', function() {
+			this.myMarkerInfo.setContent("<b>Location</b><br><span style='font-size: 12px;'>(" + latlng.lat().toFixed(4) + "," + latlng.lng().toFixed(4) + ")</span><br><span id='myAddress'>" + placeName + "</span>");
 
-			infowindow.open(this.map, this.myMarker);
-		});
+			this.myMarkerInfo.open(this.map, this.myMarker);
+		}.bind(this));
 		google.maps.event.trigger(marker, 'click');
 		return marker;
 	},
@@ -184,12 +192,12 @@ mapper.UI.prototype = {
 			position : latlng,
 			map : this.map
 		});
-		map.panTo(latlng);
+		this.map.panTo(latlng);
 		if (this.myMarker) {
 			this.myMarker.setMap(null);
 			this.myMarker = null;
 		}
-		this.myMarker = createMarker(latlng, name);
+		this.myMarker = this.createMarker(latlng, name);
 	},
 	findLocation : function(fb_data) {
 
@@ -213,7 +221,7 @@ mapper.UI.prototype = {
 				address : placeName,
 				sensor : "false"
 			}
-		}).done(function(response) {
+		}).done( function(response) {
 			console.log(response);
 			var loc = response.results[0].geometry.location;
 			var ll = new google.maps.LatLng(loc["lat"], loc["lng"]);
@@ -229,13 +237,83 @@ mapper.UI.prototype = {
 		}, function(results, status) {
 			if (status == google.maps.GeocoderStatus.OK) {
 				if (results[1]) {
-					setMarkerPos(latlng, results[1].formatted_address);
+					this.setMarkerPos(latlng, results[1].formatted_address);
 					//$("#" + divId).text(results[1].formatted_address);
 				}
 			} else {
 				$("#" + divId).text("unknown");
 			}
-		});
+		}.bind(this));
+	},
+
+	/**
+	 * Toggles Marker Clusterer visibility.
+	 */
+	toggleMarkerClusterer : function() {
+		showMarketClusterer = !showMarketClusterer;
+		if (showMarketClusterer) {
+			if (this.mc) {
+				this.mc.addMarkers(this.markers.locations);
+			} else {
+				this.mc = new MarkerClusterer(this.map, this.markers.locations, {
+					maxZoom : 19
+				});
+			}
+		} else {
+			this.mc.clearMarkers();
+		}
+	},
+
+	/**
+	 * Toggles Marker Manager visibility.
+	 */
+	toggleMarkerManager : function() {
+		showMarketManager = !showMarketManager;
+		if (this.mgr) {
+			if (showMarketManager) {
+				this.mgr.addMarkers(this.markers.countries, 0, 5);
+				this.mgr.addMarkers(this.markers.places, 6, 11);
+				this.mgr.addMarkers(this.markers.locations, 12);
+				this.mgr.refresh();
+			} else {
+				this.mgr.clearMarkers();
+				this.mgr.refresh();
+			}
+		} else {
+			this.mgr = new MarkerManager(this.map, {
+				trackMarkers : true,
+				maxZoom : 15
+			});
+			google.maps.event.addListener(this.mgr, 'loaded', function() {
+				//mgr.addMarkers(markers.countries, 0, 5);
+				// mgr.addMarkers(markers.places, 6, 11);
+				// mgr.addMarkers(markers.locations, 12);
+				this.mgr.refresh();
+			});
+		}
+	},
+
+	/**
+	 * Toggles Fusion Tables layer visibility.
+	 * Toggles Fusion Tables layer visibility.
+	 */
+	toggleFusion : function() {
+		if (!fusionLayer) {
+			fusionLayer = new google.maps.FusionTablesLayer(232506, {
+				suppressInfoWindows : false
+			});
+			showFusionLayerHeatmap = false;
+			fusionLayer.set('heatmap', showFusionLayerHeatmap);
+		}
+		showFusionLayer = !showFusionLayer;
+		var li = document.getElementById('fusion-hm-li');
+		if (showFusionLayer) {
+			fusionLayer.setMap(this.map);
+			li.style.visibility = 'visible';
+		} else {
+			fusionLayer.setMap(null);
+			li.style.visibility = 'hidden';
+		}
 	}
 }
 
